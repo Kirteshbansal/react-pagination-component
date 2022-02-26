@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import Pagination from "./components/Pagination";
+import Posts from "./components/Posts";
+import "./App.css";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const App = () => {
+    const [post, setPost] = useState([]);
+    const [paginatedRes, setPaginatedRes] = useState({});
+    const paginatedData = post.slice(paginatedRes.initialIndex, paginatedRes.endIndex);
+
+    useEffect(() => {
+        (async () => {
+            const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
+            setPost(res.data);
+        })();
+    }, []);
+
+    const onChangeHandler = useCallback((res) => setPaginatedRes(res), []);
+
+    return (
+        <div className="container my-5">
+            <Posts data={paginatedData} />
+            <Pagination
+                itemsPerPage={8}
+                showFirstButton
+                showLastButton
+                totalItems={post.length}
+                onChange={onChangeHandler}
+            />
+        </div>
+    );
+};
 
 export default App;
